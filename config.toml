@@ -1,0 +1,4 @@
+database = "gwent.db"
+fr_list = [["icon icon--northernrealms", "Королевства Севера"], ["icon icon--skellige", "Скеллиге"], ["icon icon--scoiatael", "Скоя’таэли"], ["icon icon--monsters", "Чудовища"], ["icon icon--nilfgaard", "Нильфгаард"], ["icon icon--arena ", "Арена"], ["icon icon--syndicate", "Синдикат"]]
+input = "gwent.html"
+csv_file = "gwent.csv"
