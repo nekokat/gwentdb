@@ -46,5 +46,5 @@ def from_file(import_from):
     return from_csv() if import_from == 2 else []
 
 def log(new_lines = num_line):
-  print(f'\nДобавлено: {new_lines} записей.')
-  print('Завершено')
+  print(f'\nAdded: {new_lines} lines.')
+  print('Done')
