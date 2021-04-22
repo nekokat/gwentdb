@@ -12,4 +12,5 @@ version = "0.1.0"
 lxml = "^4.4"
 python = "^3.8"
 toml = "^0.10.2"
+bs4 = "^0.0.1"
 [tool.poetry.dev-dependencies]

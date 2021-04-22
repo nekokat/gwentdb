@@ -1,10 +1,8 @@
-from lxml.html import parse, HTMLParser
+import bs4
+from bs4 import BeautifulSoup as soup
 import table as tb
 import toml
 import csv
-
-partition = lambda l, n = 2: [l[i:i+n] for i in range(0, len(l), n)]
-trans = lambda x: list(map(tuple, zip(*x)))
 
 #config
 cfg = toml.load('config.toml')
@@ -15,17 +13,21 @@ csv_file = cfg['csv_file']
 lastrow = tb.read()
 
 #html parsing
-page = parse(inp.encode("utf-8"), HTMLParser(encoding="utf-8"))
-col = trans(partition(page.xpath('//tr//td/text()'), 5))
+with open(inp, "r") as f:
+  contents = f.read() 
+  sp = soup(contents, 'lxml') 
+  lines = [tuple(j) for j in sp.tbody.find_all("tr")]
 
-#fractions
-fr, op_fr = trans(partition([data[i.attrib['class']] for i in page.xpath('//i')]))
+def modify(lines = lines):
+  res = []
+  for i in lines:
+    opp_fr = data[i[3].i['class'][1]]
+    result_score = i[4].text.split(" ")
+    tpl = (i[0].text, i[2].text, i[3].text, opp_fr, *result_score)
+    res.append(tpl)
+  return res
 
-#result & score
-res_sc = trans(map(lambda x: x.split(" "), col[4]))
-
-#fresh data
-lines = trans([col[0], fr, col[3], op_fr] + res_sc)
+lines = modify()
 
 #lastrow id in fresh inputs data
 num_line = lines.index(lastrow)
