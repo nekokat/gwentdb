@@ -2,3 +2,6 @@ database = "gwent.db"
 fr_list = [["icon--northernrealms", "Королевства Севера"], ["icon--skellige", "Скеллиге"], ["icon--scoiatael", "Скоя’таэли"], ["icon--monsters", "Чудовища"], ["icon--nilfgaard", "Нильфгаард"], ["icon--arena ", "Арена"], ["icon--syndicate", "Синдикат"]]
 input = "gwent.html"
 csv_file = "gwent.csv"
+games_type = ["Рейтинговый", "Обычный", "Дружеский", "режиме подбора"]
+fraction = ["Королевства Севера", "Скеллиге", "Скоя’таэли", "Чудовища", "Нильфгаард", "Синдикат"]
+result = ["Победа", "Поражение", "Ничья"]
