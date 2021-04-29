@@ -19,7 +19,7 @@ def read(table = 'lastrow'):
   if bol != 0:
     return cursor.execute(f'SELECT * FROM {table}').fetchall()[0]
 
-def write(row, table = 'lastrow'):
+def write(row, table = 'games'):
   cursor.executemany(f"INSERT INTO {table} VALUES (?,?,?,?,?,?)", row)
   conn.commit()
 

@@ -21,7 +21,8 @@ with open(inp, "r") as f:
 def modify(lines = lines):
   res = []
   for i in lines:
-    opp_fr = data[i[3].i['class'][1]]
+    oppfr = i[3].i['class'][1]
+    opp_fr = data[oppfr]
     result_score = i[4].text.split(" ")
     tpl = (i[0].text, i[2].text, i[3].text, opp_fr, *result_score)
     res.append(tpl)

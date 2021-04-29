@@ -9,7 +9,7 @@ def run():
   
   if lines != []:
     tb.update(lines[0]) if import_from == 1 else None
-    tb.write(lines[::-1], 'games')
+    tb.write(lines[::-1])
   
   log(len(lines))
 
