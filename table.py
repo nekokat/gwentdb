@@ -20,8 +20,7 @@ def create(table = 'lastrow'):
   conn.commit()
 
 def read(table = 'lastrow'):
-  bol = cursor.execute(f"SELECT count(*) FROM {table}").fetchall()[0][0]
-  if bol != 0:
+  if count() != 0:
     return cursor.execute(f'SELECT * FROM {table}').fetchall()[0]
 
 def write(row, table = 'games'):
