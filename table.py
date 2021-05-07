@@ -1,82 +1,64 @@
 import sqlite3
 import toml
+from pivot import pivot_header, update_pivot
+from support import сondition
 
 #config
 cfg = toml.load('config.toml')
-name_data = cfg['database']
-fr = cfg['fraction']
-result = cfg['result']
+name_database = cfg['database']
+fraction = dict(cfg['fraction'])
+result = dict(cfg['result'])
 
 #database
-conn = sqlite3.connect(name_data)
+conn = sqlite3.connect(name_database)
 cursor = conn.cursor()
 
-#support
-dt = lambda x, y= ", ": y.join([f"{i} = '{j}'" for i,j in x])
+#table title
+games_title = ['game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result', 'score']
+
+def header(table):
+  column_list = pivot_header(table)
+  if table in ['lastrow', 'games']:
+    return "'{}'".format("','".join(games_title))
+  elif table in ['win_loss', 'versus']:
+    return "'Fraction', {}".format(column_list)
+  elif table == 'overall':
+    return "'Overall', {}".format(column_list)
+
+def count(_where = [], table = 'games'):
+  _where = " WHERE " + сondition(_where, " AND ") if _where != [] else ""
+  request = f"SELECT count(*) FROM {table}{_where}"
+  return cursor.execute(request).fetchall()[0][0]
 
 def create(table = 'lastrow'):
-  header = f"({ciu('c', table)})"
-  cursor.execute(f'CREATE TABLE {table} {header}')
+  request = f"CREATE TABLE {table} ({header(table)})"
+  cursor.execute(request)
   conn.commit()
 
-def read(table = 'lastrow'):
-  if count() != 0:
+def read(_where = {}, table = 'lastrow'):
+  if table == 'lastrow' and count() != 0 and _where == {}:
     return cursor.execute(f'SELECT * FROM {table}').fetchall()[0]
+  elif table in ['win_loss', 'versus']:
+    column_list = pivot_header(table)
+    for fr in _where.keys():
+      request = f"SELECT {column_list} FROM {table} WHERE Fraction = '{fr}'"
+      print(cursor.execute(request).fetchall()[0])
 
 def write(row, table = 'games'):
   if table in ['lastrow', 'games']:
     cursor.executemany(f"INSERT INTO {table} VALUES (?,?,?,?,?,?)", row)
-  conn.commit()
-
-def pivot(table):
-  tr, dt = [result, 'result'] if table == 'win_loss' else [fr, 'opponent_fraction']
-  for i in fr:
-    x = tuple(count(condition = [('fraction', i),(dt ,j)]) for j in tr)
-    col = (i,) + x + (sum(x),)
-    cursor.execute("INSERT INTO {} ('Fraction', '{}', 'Total') VALUES {}".format(table,"', '".join(tr), col))
+  #print(update_pivot(row, 'versus'))
+  print(update_pivot(row, 'win_loss'))
   conn.commit()
 
 def update(row, table = 'lastrow'):
-  data = ciu('c', table).split(", ")
   if table in ['games', 'lastrow']:
-    name = dt([('rowid',1)])
-    text = f"UPDATE {table} SET " + dt(list(zip(data, row))) + f" WHERE {name}"
-    print(text)
-  elif table in ['win_loss', 'versus']:
-    name = 'Fraction'
-
-  cursor.execute(text)
+    _set = сondition(list(zip(games_title, row)))
+    _where = сondition([('rowid',1)])
+    request = f"UPDATE {table} SET {_set} WHERE {_where}"
+    cursor.execute(request)
   conn.commit()
 
 def drop(table = 'lastrow'):
   cursor.execute(f'DROP TABLE {table}')
   conn.commit()
-
-def ciu(execute_type, table):
-  rs = result if table == 'win_loss' else fr
-  if execute_type == 'c':
-    if table in ['lastrow', 'games']:
-      return "'game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result', 'score'"
-    elif table in ['win_loss', 'versus']:
-      return "'Fraction', '{}', 'Total'".format("', '".join(rs))
-  elif execute_type == 'i':
-    None
-  elif execute_type == 'u':
-    None
-
-def count(table = 'games', condition = []):
-  cond = " WHERE " + dt(condition, " AND ") if condition != [] else ""
-  return cursor.execute(f"SELECT count(*) FROM {table}{cond}").fetchall()[0][0]
-
-def injection ():
-  None
-
-'''
-drop('versus')
-drop('win_loss')
-create('win_loss')
-create('versus')
-pivot('versus')
-pivot('win_loss')
-'''
-print(dt([('rowid',1)]))
