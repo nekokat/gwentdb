@@ -28,11 +28,11 @@ def from_csv(filename = csv_file):
   with open(filename, newline='', encoding='utf-8') as f:
     reader = csv.reader(f, delimiter=';')
     rows_from_csv = [tuple(row) for row in reader]
-    log(len(rows_from_csv))
-    return rows_from_csv
+  log(len(rows_from_csv))
+  return rows_from_csv
 
 def import_file(import_from):
   if import_from == 1:
     return from_html()
   else:
-    return from_csv() if import_from == 2 else []
+    return from_csv() if import_from == 2 else None
