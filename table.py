@@ -1,6 +1,6 @@
 import sqlite3
 import toml
-from pivot import pivot_header, update_pivot
+import pivot as pv
 from support import сondition
 
 #config
@@ -16,22 +16,22 @@ cursor = conn.cursor()
 #table title
 games_title = ['game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result', 'score']
 
-def header(table):
-  column_list = pivot_header(table)
-  if table in ['lastrow', 'games']:
-    return "'{}'".format("','".join(games_title))
-  elif table in ['win_loss', 'versus']:
-    return "'Fraction', {}".format(column_list)
-  elif table == 'overall':
-    return "'Overall', {}".format(column_list)
-
 def count(_where = [], table = 'games'):
   _where = " WHERE " + сondition(_where, " AND ") if _where != [] else ""
   request = f"SELECT count(*) FROM {table}{_where}"
   return cursor.execute(request).fetchall()[0][0]
 
 def create(table = 'lastrow'):
-  request = f"CREATE TABLE {table} ({header(table)})"
+  def header():
+    column_list = pv.header(table)
+    if table in ['lastrow', 'games']:
+      return "'{}'".format("','".join(games_title))
+    elif table in ['win_loss', 'versus']:
+      return "'Fraction', {}".format(column_list)
+    elif table == 'overall':
+      return "'Overall', {}".format(column_list)
+  
+  request = f"CREATE TABLE {table} ({header()})"
   cursor.execute(request)
   conn.commit()
 
@@ -39,7 +39,7 @@ def read(_where = {}, table = 'lastrow'):
   if table == 'lastrow' and count() != 0 and _where == {}:
     return cursor.execute(f'SELECT * FROM {table}').fetchall()[0]
   elif table in ['win_loss', 'versus']:
-    column_list = pivot_header(table)
+    column_list = pv.header(table)
     for fr in _where.keys():
       request = f"SELECT {column_list} FROM {table} WHERE Fraction = '{fr}'"
       print(cursor.execute(request).fetchall()[0])
@@ -47,8 +47,8 @@ def read(_where = {}, table = 'lastrow'):
 def write(row, table = 'games'):
   if table in ['lastrow', 'games']:
     cursor.executemany(f"INSERT INTO {table} VALUES (?,?,?,?,?,?)", row)
-  #print(update_pivot(row, 'versus'))
-  print(update_pivot(row, 'win_loss'))
+  #print(pv.update(row, 'versus'))
+  print(pv.update(row, 'win_loss'))
   conn.commit()
 
 def update(row, table = 'lastrow'):
