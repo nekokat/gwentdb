@@ -1,5 +1,5 @@
 database = "gwent.db"
-input = "gwent.html"
+html_file = "gwent.html"
 csv_file = "gwent.csv"
 html_fraction = [["icon--northernrealms", "Королевства Севера"], ["icon--skellige", "Скеллиге"], ["icon--scoiatael", "Скоя’таэли"], ["icon--monsters", "Чудовища"], ["icon--nilfgaard", "Нильфгаард"], ["icon--arena ", "Арена"], ["icon--syndicate", "Синдикат"]]
 games_type = ["Рейтинговый", "Обычный", "Дружеский", "режиме подбора", "Арена"]

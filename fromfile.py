@@ -7,24 +7,27 @@ import csv
 #config
 cfg = toml.load('config.toml')
 html_data = dict(cfg['html_fraction'])
-inp = cfg["input"]
+html_file = cfg["html_file"]
 csv_file = cfg['csv_file']
 
-#corrected input_data
 def from_html():
+  #solved
   #html parsing
-  with open(inp, "r") as f:
+  with open(html_file, "r") as f:
     contents = f.read() 
     sp = soup(contents, 'lxml') 
-    rows = [tuple(j) for j in sp.tbody.find_all("tr")]
-  lastrow = tb.read()
-  rows = modifyrows(html_data, rows)
+    rows = [tuple(row) for row in sp.tbody.find_all("tr")]
+  lastrow = tb.read()[0]
+  #corrected row
+  rows = list(modifyrows(html_data, rows))
   #lastrow id in fresh inputs data
   num_lastrow = rows.index(lastrow)
+  tb.update(rows[0])
   log(num_lastrow)
   return rows[:num_lastrow] if lastrow in rows else rows
 
 def from_csv(filename = csv_file):
+  #solved
   with open(filename, newline='', encoding='utf-8') as f:
     reader = csv.reader(f, delimiter=';')
     rows_from_csv = [tuple(row) for row in reader]
@@ -32,6 +35,7 @@ def from_csv(filename = csv_file):
   return rows_from_csv
 
 def import_file(import_from):
+  #solved
   if import_from == 1:
     return from_html()
   else:
