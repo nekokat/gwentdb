@@ -18,23 +18,25 @@ games_title = ['game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result
 def column_header(table):
   #solved 50/50
   table_header = result if table == 'win_loss' else fractions
-  column_list = "', '".join([f"{col} INTEGER"for col in table_header.values()])
+  column_list = ', '.join([f'"{col}" INTEGER' for col in table_header.values()])
   if table in ['win_loss', 'versus']:
-    column_list = "'Fraction TEXT', '{}'".format(column_list)
+    column_list = '"Fraction"	TEXT, {}'.format(column_list)
   elif table == 'overall':
-    column_list = "'Overall INTEGER', '{}'".format(column_list)
+    column_list = '"Overall" INTEGER, {}'.format(column_list)
   return column_list
 
-def count(table = 'games', _where = []):
-  #solved
-  request = f"SELECT count(*) FROM {table}{_where if _where != [] else ''}"
+def count(table, _where = []):
+  #solved 50/50
+  request_where = f" WHERE {wheretostr(_where, ' AND ')}" if _where != [] else ''
+  request = f"SELECT count(*) FROM {table}{request_where}"
   return cursor.execute(request).fetchall()[0][0]
 
 def create(table = 'lastrow'):
+  #solved
   pivot_table = ['win_loss', 'versus', 'overall']
   def table_header():
     if table in ['lastrow', 'games']:
-      return "'{}'".format("','".join([f'{col} TEXT' for col in games_title]))
+      return "{}".format(", ".join([f'"{col}" TEXT' for col in games_title]))
     elif table in pivot_table:
       return column_header(table)
   request = f"CREATE TABLE {table} ({table_header()})"
@@ -65,7 +67,7 @@ def drop(table = 'lastrow'):
   #solved
   cursor.execute(f'DROP TABLE {table}')
   conn.commit()
-
+  
 print('Programm is working, but...')
-print('!!!!WARNING!!!! need to rewrite "read" complite for 50% in table module')
-print('!!!!WARNING!!!! need to rewrite "create" complite for 50% in pivot module')
+print('!!!!WARNING!!!! need to rewrite "read" (complite 50%) in table module')
+print('!!!!WARNING!!!! need to rewrite "create, update(overall table)" (complite 30%) in pivot module')

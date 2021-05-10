@@ -30,20 +30,20 @@ def create(table):
   table_header, column = [result,'result'] if table == 'win_loss' else [fractions,'opponent_fraction']
   if table in ['win_loss', 'versus']:
     for fraction in fractions.keys():
-      column_count = tuple(tb.count([('fraction', fraction),(column, value)]) for value in table_header.keys())
+      column_count = tuple(tb.count('games', [('fraction', fraction),(column, value)]) for value in table_header.keys())
       row = (fraction,) + column_count
       request = f"INSERT INTO {table} ({request_header(table)}) VALUES {row}"
       cursor.execute(request)
       conn.commit()
   elif table in ['overall']:
-    overall = tuple(tb.count([('fraction', fraction),('result', 'Победа')]) for fraction in fractions.keys())
+    overall = tuple(tb.count('games', [('fraction', fraction),('result', 'Победа')]) for fraction in fractions.keys())
     row = (sum(overall),) + overall
     request = f"INSERT INTO {table} ({request_header(table)}) VALUES {row}"
     cursor.execute(request)
     conn.commit()
 
 def read(table, _where = {}, column_list = "*"):
-  #solved 50/50
+  #solved 75/25
   if table in ['win_loss', 'versus']:
     for fraction in _where.keys():          
       column_list = ", ".join(_where[fraction].keys())
@@ -51,14 +51,14 @@ def read(table, _where = {}, column_list = "*"):
     request = f"SELECT {column_list} FROM {table}{_where if _where != {} else ''}"
   elif table in ['overall']:
     fraction = fractions[_where] if _where != {} else '*'
-    request = f"SELECT {fraction} FROM overall"
+    request = f"SELECT Overall, {fraction} FROM overall"
   return cursor.execute(request).fetchall()
 
 def update(rows, table):
   #solved
   def settostr(_where):
     return ", ".join([f"{column} = {value}" for column, value in _where])
-  table_header, position = [result, -2] if table == 'win_loss' else [fractions, 3]
+  table_header, position = [result, -2] if table in ['win_loss', 'overall'] else [fractions, 3]
   _update = defaultdict(lambda: defaultdict(int))
   for col in rows:
     _update[col[1]][table_header[col[position]]] += 1
@@ -66,23 +66,24 @@ def update(rows, table):
     select_where = _update[fraction]
     if table in ['win_loss', 'versus']:
       select = read(table, {fraction: select_where})
-    elif table == 'overall':
-      select = read('overall', fraction)
-    _select = map(sum, zip(*select, select_where.values()))
-    _set = settostr(zip(select_where.keys(), _select))
-    if table in ['win_loss', 'versus']:
+      _select = map(sum, zip(*select, select_where.values()))
+      _set = settostr(zip(select_where.keys(), _select))
       _where = wheretostr([('Fraction', fraction)])
     elif table == 'overall':
-      _where = wheretostr([('Fraction', fraction), ('Win', "Победа")], " AND ")
+      if select_where['Win'] == 0:
+        continue
+      select = read('overall', fraction)
+      _select = map(sum, zip(*select, [select_where['Win']]*2))
+      _set = settostr(zip(['Overall', fractions[fraction]], _select))
+      _where = 'rowid = 1'
     request = f"UPDATE {table} SET {_set} WHERE {_where}"
-    print(request)
-    #cursor.execute(request)
-    #conn.commit()
+    cursor.execute(request)
+    conn.commit()
 
-def updatemany(rows, tables = ['win_loss', 'versus', 'overall']):
+def updateall(rows, tables = ['win_loss', 'versus', 'overall']):
   #solved
   [update(rows, table) for table in tables]
-    
+
 rows = [('Обычный','Нильфгаард','Fire_Player','Чудовища','Поражение','1:2'),
 ('Обычный','Синдикат','_Yoozek_','Синдикат','Победа','2:0'),
 ('Обычный','Королевства Севера','Nagaika','Нильфгаард','Ничья','2:2')]

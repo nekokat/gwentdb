@@ -21,7 +21,7 @@ def from_html():
   #corrected row
   rows = list(modifyrows(html_data, rows))
   #lastrow id in fresh inputs data
-  num_lastrow = rows.index(lastrow)
+  num_lastrow = rows.index(lastrow) if tb.count('games') != 0 else len(rows)
   tb.update(rows[0])
   log(num_lastrow)
   return rows[:num_lastrow] if lastrow in rows else rows
