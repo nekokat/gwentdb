@@ -17,14 +17,17 @@ def from_html():
     contents = f.read() 
     sp = soup(contents, 'lxml') 
     rows = [tuple(row) for row in sp.tbody.find_all("tr")]
-  lastrow = tb.read()[0]
   #corrected row
   rows = list(modifyrows(html_data, rows))
-  #lastrow id in fresh inputs data
-  num_lastrow = rows.index(lastrow) if tb.count('games') != 0 else len(rows)
+  if tb.count('lastrow') == 0:
+    tb.write([rows[0]], 'lastrow')
+    num_lastrow = len(rows)
+  else:
+    lastrow = tb.read()[0]
+    num_lastrow = rows.index(lastrow)
   tb.update(rows[0])
   log(num_lastrow)
-  return rows[:num_lastrow] if lastrow in rows else rows
+  return rows[:num_lastrow]
 
 def from_csv(filename = csv_file):
   #solved

@@ -5,6 +5,18 @@ cfg = toml.load('config.toml')
 fractions = dict(cfg['fraction'])
 result = dict(cfg['result'])
 
+main_title = ('game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result', 'score')
+
+def request_header(table):
+  table_header = result if table == 'win_loss' else fractions
+  if table in ['win_loss', 'versus']:
+    column_list = ('Fraction',) + tuple(table_header.values())
+  elif table == 'overall':
+    column_list = ('Overall',) + tuple(table_header.values())
+  elif table in ['games', 'lastrow']:
+    column_list = main_title
+  return column_list
+
 def modifyrows(html_data ,rows):
   #solved
   for row in rows:
