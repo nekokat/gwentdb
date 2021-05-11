@@ -14,14 +14,15 @@ pivot_table = ['win_loss', 'versus', 'overall']
 
 def table_header(table):
   #solved
-  title = request_header(table)
+  header = request_header(table)
   if table in main_table:
-    types = ("TEXT",)*len(title)
+    types = ("TEXT",)*len(header)
   elif table in ['win_loss', 'versus']:
-    types = ("TEXT",) +("INTEGER",)*(len(title)-1)
+    types = ("TEXT",) + ("INTEGER",)*(len(header)-1)
   elif table in ['overall']:
-    types = ("INTEGER",)*len(title)
-  return "({})".format(", ".join([f'"{col}" {col_type}' for col, col_type in zip(title, types)]))
+    types = ("INTEGER",)*len(header)
+  title = [f'"{col}" {col_type}' for col, col_type in zip(header, types)]
+  return "({})".format(", ".join(title))
 
 def create(table):
   #solved
@@ -54,5 +55,3 @@ def createall():
 
   for table in pivot_table:
     create_pivot(table)
-  
-createall()

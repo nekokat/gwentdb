@@ -8,14 +8,16 @@ result = dict(cfg['result'])
 main_title = ('game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result', 'score')
 
 def request_header(table):
-  table_header = result if table == 'win_loss' else fractions
+  #solved
+  header = result if table == 'win_loss' else fractions
+  columns = tuple(header.values())
   if table in ['win_loss', 'versus']:
-    column_list = ('Fraction',) + tuple(table_header.values())
+    table_header = ('Fraction',) + columns
   elif table == 'overall':
-    column_list = ('Overall',) + tuple(table_header.values())
+    table_header = ('Overall',) + columns
   elif table in ['games', 'lastrow']:
-    column_list = main_title
-  return column_list
+    table_header = main_title
+  return table_header
 
 def modifyrows(html_data ,rows):
   #solved
@@ -24,8 +26,9 @@ def modifyrows(html_data ,rows):
     result_score = row[4].text.split(" ")
     yield (row[0].text, row[2].text, row[3].text, opp_fraction, *result_score)
 
-def wheretostr(_where, jumper= ", "):
-  return jumper.join([f"{column} = '{value}'" for column, value in _where])
+def wheretostr(_where, jumper = ", "):
+  _where = [f"{column} = '{value}'" for column, value in _where]
+  return jumper.join(_where)
 
 def log(countrows=0):
   #solved

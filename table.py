@@ -12,8 +12,8 @@ games_title = ['game_mode', 'fraction', 'opponent', 'opponent_fraction', 'result
 
 def count(table, _where = []):
   #solved 50/50
-  request_where = f" WHERE {wheretostr(_where, ' AND ')}" if _where != [] else ''
-  request = f"SELECT count(*) FROM {table}{request_where}"
+  _where = f" WHERE {wheretostr(_where, ' AND ')}" if _where != [] else ''
+  request = f"SELECT count(*) FROM {table}{_where}"
   return CURSOR.execute(request).fetchall()[0][0]
 
 def read(table = 'lastrow', _where = {}):
@@ -41,6 +41,6 @@ def drop(table = 'lastrow'):
   #solved
   CURSOR.execute(f'DROP TABLE {table}')
   CONN.commit()
-  
+
 print('Programm is working, but...')
 print('!!!!WARNING!!!! need to rewrite "read" (complite 30%) in pivot module')
