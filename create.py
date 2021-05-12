@@ -38,15 +38,11 @@ def create_pivot(table):
     for fraction in fractions.keys():
       column_count = tuple(tb.count('games', [('fraction', fraction),(column, value)]) for value in header.keys())
       row = (fraction,) + column_count
-      request = f"INSERT INTO {table} {request_header(table)} VALUES {row}"
-      CURSOR.execute(request)
-      CONN.commit()
+      tb.write(row, table)
   elif table in ['overall']:
     overall = tuple(tb.count('games', [('fraction', fraction),('result', 'Победа')]) for fraction in fractions.keys())
     row = (sum(overall),) + overall
-    request = f"INSERT INTO {table} {request_header(table)} VALUES {row}"
-    CURSOR.execute(request)
-    CONN.commit()
+    tb.write(row, table)
 
 def createall():
   #solved

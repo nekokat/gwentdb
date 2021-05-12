@@ -1,5 +1,5 @@
 import toml
-from support import wheretostr
+from support import wheretostr, request_header
 from connection import CONN, CURSOR
 
 #config
@@ -27,7 +27,14 @@ def read(table = 'lastrow', _where = {}):
 
 def write(rows, table = 'games'):
   #solved
-  CURSOR.executemany(f"INSERT INTO {table} VALUES (?,?,?,?,?,?)", rows)
+  if type(rows) == tuple:
+    request = f"INSERT INTO {table} {request_header(table)} VALUES {rows}"    
+    print(request)
+    CURSOR.execute(request, rows)
+  else:
+    request = f"INSERT INTO {table} VALUES (?, ?, ?, ?, ?, ?)"
+    print(request)
+    CURSOR.executemany(request, rows)
   CONN.commit()
 
 def update(row):
@@ -41,6 +48,3 @@ def drop(table = 'lastrow'):
   #solved
   CURSOR.execute(f'DROP TABLE {table}')
   CONN.commit()
-
-print('Programm is working, but...')
-print('!!!!WARNING!!!! need to rewrite "read" (complite 30%) in pivot module')

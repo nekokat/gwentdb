@@ -20,7 +20,7 @@ def from_html():
   #corrected row
   rows = list(modifyrows(html_data, rows))
   if tb.count('lastrow') == 0:
-    tb.write([rows[0]], 'lastrow')
+    tb.write(rows[0], 'lastrow')
     num_lastrow = len(rows)
   else:
     lastrow = tb.read()[0]
