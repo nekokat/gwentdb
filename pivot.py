@@ -1,20 +1,20 @@
 from support import wheretostr
+import table as tb
 from collections import defaultdict
 from connection import CONN, CURSOR
+from create import pivot_table
 import toml
+import plot as pl
 
 #config
 cfg = toml.load('config.toml')
 fractions = dict(cfg['fraction'])
 result = dict(cfg['result'])
 
-def read(table, _where = {}, column_list = "*"):
+def read(table, _where = {}):
   #solved
   if table in ['win_loss', 'versus']:
-    for fraction in _where.keys():          
-      column_list = ", ".join(_where[fraction].keys())
-      _where = f" WHERE Fraction = '{fraction}'"
-    request = f"SELECT {column_list} FROM {table}{_where if _where != {} else ''}"
+    return tb.read(table, _where)
   elif table in ['overall']:
     fraction = ('Overall, ' + fractions[_where]) if _where != {} else '*'
     request = f"SELECT {fraction} FROM overall"
@@ -46,7 +46,10 @@ def update(rows, table):
     CURSOR.execute(request)
     CONN.commit()
 
-def updateall(rows, tables = ['win_loss', 'versus', 'overall']):
+def updateall(rows, tables = pivot_table):
   #solved
   [update(rows, table) for table in tables]
+  for table in tables:
+    print(f"\nTable: {table}\n")
+    pl.print_table(table)
 

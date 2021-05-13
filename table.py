@@ -28,12 +28,10 @@ def read(table = 'lastrow', _where = {}):
 def write(rows, table = 'games'):
   #solved
   if type(rows) == tuple:
-    request = f"INSERT INTO {table} {request_header(table)} VALUES {rows}"    
-    print(request)
+    request = f"INSERT INTO {table} {request_header(table)} VALUES {rows}"
     CURSOR.execute(request, rows)
   else:
     request = f"INSERT INTO {table} VALUES (?, ?, ?, ?, ?, ?)"
-    print(request)
     CURSOR.executemany(request, rows)
   CONN.commit()
 
