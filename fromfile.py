@@ -14,7 +14,7 @@ csv_file = cfg["csv_file"]
 def from_html():
     # solved
     # html parsing
-    with open(html_file, "r") as f:
+    with open(html_file, "r", encoding="utf-8") as f:
         contents = f.read()
         sp = soup(contents, "lxml")
         rows = [tuple(row) for row in sp.tbody.find_all("tr")]

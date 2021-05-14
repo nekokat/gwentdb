@@ -13,5 +13,4 @@ lxml = "^4.4"
 python = "^3.8"
 toml = "^0.10.2"
 bs4 = "^0.0.1"
-pandas = "^1.2.4"
 [tool.poetry.dev-dependencies]

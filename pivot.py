@@ -4,7 +4,6 @@ from collections import defaultdict
 from connection import CONN, CURSOR
 import toml
 
-# import plot as pl
 
 # config
 cfg = toml.load("config.toml")
@@ -55,10 +54,3 @@ def update(rows, table):
 def updateall(rows, tables=["win_loss", "versus", "overall"]):
     # solved
     [update(rows, table) for table in tables]
-
-
-"""
-    for table in tables:
-        print(f"\nTable: {table}\n")
-        pl.print_table(table)
-"""
