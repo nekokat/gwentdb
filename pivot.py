@@ -54,3 +54,6 @@ def update(rows, table):
 def updateall(rows, tables=["win_loss", "versus", "overall"]):
     # solved
     [update(rows, table) for table in tables]
+
+
+print(sorted(read("overall")[0], reverse=True))
