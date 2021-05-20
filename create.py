@@ -7,6 +7,7 @@ from connection import CONN, CURSOR
 cfg = toml.load("config.toml")
 fractions = dict(cfg["fraction"])
 result = dict(cfg["result"])
+
 # tables
 main_table = ("lastrow", "games")
 

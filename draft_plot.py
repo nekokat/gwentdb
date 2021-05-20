@@ -8,12 +8,12 @@ class Border:
         self.middle_line = {"left": "╠", "right": "╣", "line": "═", "sep": "╬"}
         self.bottom_line = {"left": "╚", "right": "╝", "line": "═", "sep": "╩"}
         # line: "─"
-        self._row_separator = "║" # "│"
+        self._row_separator = "║"  # "│"
         self.row = self.row_style(self._row_separator)
         self._column_size = list()
 
     def row_style(self, sep):
-      return {
+        return {
             "left": sep.ljust(2),
             "right": sep.rjust(2),
             "sep": sep.center(3),
@@ -22,19 +22,29 @@ class Border:
     def draw_line(self, line_style):
         draw = line_style["left"]
         draw += line_style["sep"].join(
-            line_style["line"] * (column+2) for column in self._column_size
+            line_style["line"] * (column + 2) for column in self._column_size
         )
         draw += line_style["right"]
         return draw
 
-    def draw_first(self):
+    def draw_top(self):
         return self.draw_line(self.top_line)
 
     def draw_middle(self):
         return self.draw_line(self.middle_line)
 
-    def draw_last(self):
+    def draw_bottom(self):
         return self.draw_line(self.bottom_line)
+
+    def draw_row(self, row):
+        line = self.row["left"]
+        line += self.row["sep"].join(self.align(row))
+        line += self.row["right"]
+        return line
+
+    def align(self, row):
+        for col, just in zip(row, self._column_size):
+            yield str(col).center(just)
 
     @property
     def row_separator(self):
@@ -99,26 +109,16 @@ class Printify:
         self._header = header
         self.column_size(header)
 
-    def draw_row(self, row):
-        line = self._border.row["left"]
-        line += self._border.row["sep"].join(self.align(row))
-        line += self._border.row["right"]
-        return line
-
-    def align(self, row):
-        for col, just in zip(row, self._column_size):
-            yield str(col).center(just)
-
     def printify(self):
-        print(self._border.draw_first())
+        print(self._border.draw_top())
         sep = f"\n{self._border.draw_middle()}\n"
         data = [self._header, *self._rows]
-        print(sep.join(self.draw_row(row) for row in data))
-        print(self._border.draw_last())
+        print(sep.join(self._border.draw_row(row) for row in data))
+        print(self._border.draw_bottom())
 
     def __str__(self):
         self.printify()
-        return f"table '{self._table_name}' size: {len(self._rows)} x {len(self._column_size)}"
+        return f"table '{self._table_name}'"
 
 
 table = Printify("versus")

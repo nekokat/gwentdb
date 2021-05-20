@@ -1,7 +1,22 @@
 database = "gwent.db"
 html_file = "gwent.html"
 csv_file = "gwent.csv"
-html_fraction = [["icon--northernrealms", "Королевства Севера"], ["icon--skellige", "Скеллиге"], ["icon--scoiatael", "Скоя’таэли"], ["icon--monsters", "Чудовища"], ["icon--nilfgaard", "Нильфгаард"], ["icon--arena ", "Арена"], ["icon--syndicate", "Синдикат"]]
+html_fraction = [
+    ["icon--northernrealms", "Королевства Севера"],
+    ["icon--skellige", "Скеллиге"],
+    ["icon--scoiatael", "Скоя’таэли"],
+    ["icon--monsters", "Чудовища"],
+    ["icon--nilfgaard", "Нильфгаард"],
+    ["icon--arena ", "Арена"],
+    ["icon--syndicate", "Синдикат"],
+]
 games_type = ["Рейтинговый", "Обычный", "Дружеский", "режиме подбора", "Арена"]
-fraction = [["Королевства Севера", "Northern_Realms"], ["Скеллиге", "Skellige"], ["Скоя’таэли", "Scoia’tael"], ["Чудовища", "Monsters"], ["Нильфгаард", "Nilfgaard"], ["Синдикат", "Syndicate"]]
+fraction = [
+    ["Королевства Севера", "Northern_Realms"],
+    ["Скеллиге", "Skellige"],
+    ["Скоя’таэли", "Scoia’tael"],
+    ["Чудовища", "Monsters"],
+    ["Нильфгаард", "Nilfgaard"],
+    ["Синдикат", "Syndicate"],
+]
 result = [["Победа", "Win"], ["Поражение", "Loss"], ["Ничья", "Draw"]]
