@@ -35,10 +35,13 @@ def modifyrows(html_data, rows):
         yield (row[0].text, row[2].text, row[3].text, opp_fraction, *result_score)
 
 
-def wheretostr(_where, jumper=", "):
+def wheretostr(_where, jumper = ", "):
     _where = [f"{column} = '{value}'" for column, value in _where]
     return jumper.join(_where)
 
+def settostr(_set, jumper = ", "):
+    _set = [f"{column} = '{value}'" for column, value in _set]
+    return jumper.join(_set)
 
 def log(countrows=0):
     # solved

@@ -1,4 +1,4 @@
-from support import wheretostr
+from support import wheretostr, settostr
 import table as tb
 from collections import defaultdict
 from connection import CONN, CURSOR
@@ -23,9 +23,6 @@ def read(table, _where={}):
 
 def update(rows, table):
     # solved
-    def settostr(_where):
-        return ", ".join([f"{column} = {value}" for column, value in _where])
-
     table_header, position = (
         [result, -2] if table in ["win_loss", "overall"] else [fractions, 3]
     )

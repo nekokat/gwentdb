@@ -1,5 +1,5 @@
 import toml
-from support import wheretostr, request_header
+from support import wheretostr, request_header, settostr
 from connection import CONN, CURSOR
 
 # config
@@ -48,7 +48,7 @@ def write(rows, table="games"):
 
 def update(row):
     # solved
-    _set = wheretostr(zip(games_title, row))
+    _set = settostr(zip(games_title, row))
     request = f"UPDATE lastrow SET {_set} WHERE rowid = 1"
     CURSOR.execute(request)
     CONN.commit()
