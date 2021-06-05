@@ -78,7 +78,7 @@ class Printify:
         column_size = list(map(max, zip(*width, self._column_size)))
         self._border._column_size = column_size
         return column_size
-
+      
     def column_size(self, row):
         if self._column_size == list():
             self._column_size = [0] * len(self._header)
@@ -108,17 +108,18 @@ class Printify:
     def header(self, header):
         self._header = header
         self.column_size(header)
-
-    def printify(self):
-        print(self._border.draw_top())
+    
+    def print_middle(self):
         sep = f"\n{self._border.draw_middle()}\n"
         data = [self._header, *self._rows]
-        print(sep.join(self._border.draw_row(row) for row in data))
-        print(self._border.draw_bottom())
+        return f"\n{sep.join(self._border.draw_row(row) for row in data)}\n"
 
     def __str__(self):
-        self.printify()
-        return f"table '{self._table_name}'"
+        line = self._border.draw_top()
+        line += self.print_middle()
+        line += self._border.draw_bottom()
+        line += f"\ntable '{self._table_name}'"
+        return line
 
 
 table = Printify("versus")
