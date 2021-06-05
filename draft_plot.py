@@ -122,17 +122,17 @@ class Printify:
         return line
 
 
-table = Printify("versus")
-table.header = request_header(table.table_name)
-table.add_rows(tb.read(table.table_name))
-print(table)
+versus = Printify("versus")
+versus.header = request_header(versus.table_name)
+versus.add_rows(tb.read(versus.table_name))
+print(versus)
 
-table1 = Printify("win_loss")
-table1.header = request_header(table1.table_name)
-table1.add_rows(tb.read(table1.table_name))
-print(table1)
+win_loss = Printify("win_loss")
+win_loss.header = request_header(win_loss.table_name)
+win_loss.add_rows(tb.read(win_loss.table_name))
+print(win_loss)
 
-table2 = Printify("overall")
-table2.header = request_header(table2.table_name)
-table2.add_rows(tb.read(table2.table_name))
-print(table2)
+overall = Printify("overall")
+overall.header = request_header(overall.table_name)
+overall.add_rows(tb.read(overall.table_name))
+print(overall)
