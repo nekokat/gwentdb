@@ -118,7 +118,7 @@ class Printify:
         line = self._border.draw_top()
         line += self.print_middle()
         line += self._border.draw_bottom()
-        line += f"\ntable '{self._table_name}'"
+        line += f"\ntable '{self._table_name}'\n"
         return line
 
 
