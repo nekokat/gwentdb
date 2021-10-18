@@ -1,13 +1,13 @@
-"""Creating tables in the database (master and pivot)"""
+from connection import CONN, CURSOR
 import pivot as pv
 from support import request_header
-from connection import CONN, CURSOR
+
 
 MASTER_TABLE = ("lastrow", "games")
 
 
 def table_header(table: str) -> str:
-    """Create table header for db request"""
+    """Creating table header for db query"""
     header = request_header(table)
     l = len(header)
     if table in MASTER_TABLE:

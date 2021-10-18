@@ -23,7 +23,6 @@ def read(table: str, _where: dict = {}) -> list:
 
 def update(rows: list, table: str) -> None:
     _update = create_update(rows, table)
-    print(_update)
     for fraction in _update.keys():
         select_where = _update[fraction]
         if table in ["win_loss", "versus"]:

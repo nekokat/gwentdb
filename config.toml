@@ -1,6 +1,7 @@
 database = "gwent.db"
 html_file = "gwent.html"
 csv_file = "gwent.csv"
+border_config = "border_config.toml"
 html_fraction = [
     ["icon--northernrealms", "Королевства Севера"],
     ["icon--skellige", "Скеллиге"],

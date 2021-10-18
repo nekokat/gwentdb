@@ -4,7 +4,7 @@ import pivot as pv
 
 
 def run() -> None:
-    """Run script and import"""
+    """Runing script and importing data"""
     import_from = int(input("Import from\n(default = 1)\n\n1 - html\n2 - csv\n") or 1)
     rows = import_file(import_from)
     if rows != []:
