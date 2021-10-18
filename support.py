@@ -49,13 +49,6 @@ def settostr(_set, delimiter: str = ", ") -> str:
     return delimiter.join(_set)
 
 
-'''
-def settostr(_set, delimiter: str = ", ") -> str:
-    """Creates a 'set' clause to query a database query"""
-    return wheretostr(_set, delimiter)
-'''
-
-
 def log(countrows: int = 0) -> None:
     """Informs about the number of added records per session"""
     print(f"\nAdded: {countrows} rows.")

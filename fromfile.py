@@ -42,7 +42,7 @@ def from_csv(filename: str = CSV_FILE) -> list:
     return rows_from_csv
 
 
-def import_file(import_from):
+def import_file(import_from: int) -> list:
     """Choising import method"""
     if import_from == 1:
         return from_html()
