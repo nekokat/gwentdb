@@ -1,10 +1,11 @@
+"""Opening the database"""
 import sqlite3
 import toml
 
 # config
-cfg = toml.load("config.toml")
-name_database = cfg["database"]
+CFG = toml.load("config.toml")
+DATABASE_NAME = CFG["database"]
 
 # database
-CONN = sqlite3.connect(name_database)
+CONN = sqlite3.connect(DATABASE_NAME)
 CURSOR = CONN.cursor()

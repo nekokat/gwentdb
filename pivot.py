@@ -6,51 +6,97 @@ import toml
 
 
 # config
-cfg = toml.load("config.toml")
-fractions = dict(cfg["fraction"])
-result = dict(cfg["result"])
+CFG = toml.load("config.toml")
+FRACTIONS = dict(CFG["fraction"])
+RESULT = dict(CFG["result"])
 
 
-def read(table, _where={}):
+def read(table: str, _where: dict = {}) -> list:
     # solved
     if table in ["win_loss", "versus"]:
         return tb.read(table, _where)
     elif table in ["overall"]:
-        fraction = ("Overall, " + fractions[_where]) if _where != {} else "*"
+        fraction = ("Overall, " + FRACTIONS[_where]) if _where != {} else "*"
         request = f"SELECT {fraction} FROM overall"
     return CURSOR.execute(request).fetchall()
 
 
-def update(rows, table):
-    # solved
-    table_header, position = (
-        [result, -2] if table in ["win_loss", "overall"] else [fractions, 3]
-    )
-    _update = defaultdict(lambda: defaultdict(int))
-    for col in rows:
-        _update[col[1]][table_header[col[position]]] += 1
+def update(rows: list, table: str) -> None:
+    _update = create_update(rows, table)
+    print(_update)
     for fraction in _update.keys():
         select_where = _update[fraction]
         if table in ["win_loss", "versus"]:
-            select = read(table, {fraction: select_where})
-            _select = map(sum, zip(*select, select_where.values()))
-            _set = settostr(zip(select_where.keys(), _select))
-            _where = wheretostr([("Fraction", fraction)])
+            set_where = update_winloss_versus(table, fraction, select_where)
         elif table == "overall":
             if select_where["Win"] == 0:
                 continue
-            select = read("overall", fraction)
-            _select = map(sum, zip(*select, [select_where["Win"]] * 2))
-            _set = settostr(zip(["Overall", fractions[fraction]], _select))
-            _where = "rowid = 1"
-        request = f"UPDATE {table} SET {_set} WHERE {_where}"
+            set_where = update_overall(fraction, select_where)
+        request = "UPDATE {} SET {} WHERE {}".format(table, *set_where)
         CURSOR.execute(request)
         CONN.commit()
 
 
-def updateall(rows, tables=["win_loss", "versus", "overall"]):
-    # solved
+def create_update(rows: list, table: str) -> dict:
+    table_header, position = (
+        [RESULT, -2] if table in ["win_loss", "overall"] else [FRACTIONS, 3]
+    )
+    _update = defaultdict(lambda: defaultdict(int))
+    for col in rows:
+        _update[col[1]][table_header[col[position]]] += 1
+    return _update
+
+
+def update_winloss_versus(table: str, fraction: str, select_where) -> tuple:
+    select = read(table, {fraction: select_where})
+    _select = map(sum, zip(*select, select_where.values()))
+    _set = settostr(zip(select_where.keys(), _select))
+    _where = wheretostr([("Fraction", fraction)])
+    return (_set, _where)
+
+
+def update_overall(fraction: str, select_where) -> tuple:
+    select = read("overall", fraction)
+    _select = map(sum, zip(*select, [select_where["Win"]] * 2))
+    _set = settostr(zip(["Overall", FRACTIONS[fraction]], _select))
+    _where = "rowid = 1"
+    return (_set, _where)
+
+
+def write(table: str) -> None:
+    """Writing data to pivot table"""
+    if table in ("win_loss", "versus"):
+        write_winloss_versus_table(table)
+    elif table in ("overall"):
+        write_overal_table(table)
+
+
+def write_winloss_versus_table(table: str) -> None:
+    """Writing data to 'win_loss' or 'versus' table"""
+    header, column = (
+        [RESULT, "result"] if table == "win_loss" else [FRACTIONS, "opponent_fraction"]
+    )
+    for fraction in FRACTIONS.keys():
+        column_count = tuple(
+            tb.count("games", [("fraction", fraction), (column, value)])
+            for value in header.keys()
+        )
+        row = (fraction,) + column_count
+        tb.write(row, table)
+
+
+def write_overal_table(table: str) -> None:
+    """Writing data to 'overall' table"""
+    overall = tuple(
+        tb.count("games", [("fraction", fraction), ("result", "Победа")])
+        for fraction in FRACTIONS.keys()
+    )
+    row = (sum(overall),) + overall
+    tb.write(row, table)
+
+
+def update_all(rows: list, tables: list = ["win_loss", "versus", "overall"]) -> None:
     [update(rows, table) for table in tables]
 
 
-print(sorted(read("overall")[0], reverse=True))
+print("overall", sorted(read("overall")[0], reverse=True))

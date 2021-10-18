@@ -1,64 +1,41 @@
-import toml
-import table as tb
+"""Creating tables in the database (master and pivot)"""
+import pivot as pv
 from support import request_header
 from connection import CONN, CURSOR
 
-# config
-cfg = toml.load("config.toml")
-fractions = dict(cfg["fraction"])
-result = dict(cfg["result"])
-
-# tables
-main_table = ("lastrow", "games")
+MASTER_TABLE = ("lastrow", "games")
 
 
-def table_header(table):
-    # solved
+def table_header(table: str) -> str:
+    """Create table header for db request"""
     header = request_header(table)
-    if table in main_table:
-        types = ("TEXT",) * len(header)
+    l = len(header)
+    if table in MASTER_TABLE:
+        types = ("TEXT",) * l
     elif table in ["win_loss", "versus"]:
-        types = ("TEXT",) + ("INTEGER",) * (len(header) - 1)
+        types = ("TEXT",) + ("INTEGER",) * (l - 1)
     elif table in ["overall"]:
-        types = ("INTEGER",) * len(header)
+        types = ("INTEGER",) * l
     title = [f'"{col}" {col_type}' for col, col_type in zip(header, types)]
     return "({})".format(", ".join(title))
 
 
-def create(table):
-    # solved
+def create(table: str) -> None:
+    """Database query to create a table"""
     request = f"CREATE TABLE {table} {table_header(table)}"
     CURSOR.execute(request)
     CONN.commit()
 
 
-def create_pivot(table):
-    # solved
+def create_pivot(table: str) -> None:
+    """Database query to create a pivot table"""
     create(table)
-    header, column = (
-        [result, "result"] if table == "win_loss" else [fractions, "opponent_fraction"]
-    )
-    if table in ("win_loss", "versus"):
-        for fraction in fractions.keys():
-            column_count = tuple(
-                tb.count("games", [("fraction", fraction), (column, value)])
-                for value in header.keys()
-            )
-            row = (fraction,) + column_count
-            tb.write(row, table)
-
-    elif table in ("overall"):
-        overall = tuple(
-            tb.count("games", [("fraction", fraction), ("result", "Победа")])
-            for fraction in fractions.keys()
-        )
-        row = (sum(overall),) + overall
-        tb.write(row, table)
+    pv.write(table)
 
 
-def createall():
-    # solved
-    for table in main_table:
+def createall() -> None:
+    """Creates all tables in the database."""
+    for table in MASTER_TABLE:
         create(table)
     for table in ("win_loss", "versus", "overall"):
         create_pivot(table)

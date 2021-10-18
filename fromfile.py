@@ -1,3 +1,4 @@
+"""Import data from html or csv"""
 from bs4 import BeautifulSoup as soup
 import table as tb
 from support import modifyrows, log
@@ -5,21 +6,23 @@ import toml
 import csv
 
 # config
-cfg = toml.load("config.toml")
-html_data = dict(cfg["html_fraction"])
-html_file = cfg["html_file"]
-csv_file = cfg["csv_file"]
+CFG = toml.load("config.toml")
+HTML_DATA = dict(CFG["html_fraction"])
+HTML_FILE = CFG["html_file"]
+CSV_FILE = CFG["csv_file"]
 
 
-def from_html():
-    # solved
-    # html parsing
-    with open(html_file, "r", encoding="utf-8") as f:
+def parsehtml(filename: str) -> list:
+    """Parsed html"""
+    with open(filename, "r", encoding="utf-8") as f:
         contents = f.read()
         sp = soup(contents, "lxml")
-        rows = [tuple(row) for row in sp.tbody.find_all("tr")]
-    # corrected row
-    rows = list(modifyrows(html_data, rows))
+        return [tuple(row) for row in sp.tbody.find_all("tr")]
+
+
+def from_html(filename: str = HTML_FILE) -> list:
+    """Import data from html"""
+    rows = list(modifyrows(HTML_DATA, parsehtml(filename)))
     if tb.count("lastrow") == 0:
         tb.write(rows[0], "lastrow")
         num_lastrow = len(rows)
@@ -31,8 +34,8 @@ def from_html():
     return rows[:num_lastrow]
 
 
-def from_csv(filename=csv_file):
-    # solved
+def from_csv(filename: str = CSV_FILE) -> list:
+    """Import data from csv"""
     with open(filename, newline="", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter=";")
         rows_from_csv = [tuple(row) for row in reader]

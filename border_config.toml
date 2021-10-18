@@ -1,0 +1,4 @@
+top_line = [["left", "╔"], ["right", "╗"], ["line", "═"], ["sep", "╦"]]
+middle_line = [["left", "╠"], ["right", "╣"], ["line", "═"], ["sep", "╬"]]
+bottom_line = [["left", "╚"], ["right", "╝"], ["line", "═"], ["sep", "╩"]]
+row_separator = "║"
