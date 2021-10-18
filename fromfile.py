@@ -1,4 +1,3 @@
-"""Import data from html or csv"""
 from bs4 import BeautifulSoup as soup
 import table as tb
 from support import modifyrows, log
@@ -13,7 +12,7 @@ CSV_FILE = CFG["csv_file"]
 
 
 def parsehtml(filename: str) -> list:
-    """Parsed html"""
+    """Parsed html file"""
     with open(filename, "r", encoding="utf-8") as f:
         contents = f.read()
         sp = soup(contents, "lxml")
@@ -21,7 +20,7 @@ def parsehtml(filename: str) -> list:
 
 
 def from_html(filename: str = HTML_FILE) -> list:
-    """Import data from html"""
+    """Import data from html file"""
     rows = list(modifyrows(HTML_DATA, parsehtml(filename)))
     if tb.count("lastrow") == 0:
         tb.write(rows[0], "lastrow")
@@ -35,7 +34,7 @@ def from_html(filename: str = HTML_FILE) -> list:
 
 
 def from_csv(filename: str = CSV_FILE) -> list:
-    """Import data from csv"""
+    """Import data from csv file"""
     with open(filename, newline="", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter=";")
         rows_from_csv = [tuple(row) for row in reader]
@@ -44,7 +43,7 @@ def from_csv(filename: str = CSV_FILE) -> list:
 
 
 def import_file(import_from):
-    # solved
+    """Choising import method"""
     if import_from == 1:
         return from_html()
     else:

@@ -13,7 +13,6 @@ ROW_SEPARATOR = CFG["row_separator"]
 
 class Border:
     """Table border symbols"""
-
     def __init__(self):
         self.top_line = TOP_LINE
         self.middle_line = MIDDLE_LINE

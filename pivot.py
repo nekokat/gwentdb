@@ -12,7 +12,7 @@ RESULT = dict(CFG["result"])
 
 
 def read(table: str, _where: dict = {}) -> list:
-    # solved
+    """Reading data from a pivot table"""
     if table in ["win_loss", "versus"]:
         return tb.read(table, _where)
     elif table in ["overall"]:
@@ -22,21 +22,23 @@ def read(table: str, _where: dict = {}) -> list:
 
 
 def update(rows: list, table: str) -> None:
+    """Updating data in a pivot table"""
     _update = create_update(rows, table)
     for fraction in _update.keys():
         select_where = _update[fraction]
         if table in ["win_loss", "versus"]:
-            set_where = update_winloss_versus(table, fraction, select_where)
+            set_where = set_where_winloss_versus(table, fraction, select_where)
         elif table == "overall":
             if select_where["Win"] == 0:
                 continue
-            set_where = update_overall(fraction, select_where)
+            set_where = set_where_overall(fraction, select_where)
         request = "UPDATE {} SET {} WHERE {}".format(table, *set_where)
         CURSOR.execute(request)
         CONN.commit()
 
 
 def create_update(rows: list, table: str) -> dict:
+    """Formation of a dictionary that contains data for updating in pivot tables"""
     table_header, position = (
         [RESULT, -2] if table in ["win_loss", "overall"] else [FRACTIONS, 3]
     )
@@ -46,7 +48,8 @@ def create_update(rows: list, table: str) -> dict:
     return _update
 
 
-def update_winloss_versus(table: str, fraction: str, select_where) -> tuple:
+def set_where_winloss_versus(table: str, fraction: str, select_where) -> tuple:
+    """Conditions for updating tables ('win_loss' or 'versus')"""
     select = read(table, {fraction: select_where})
     _select = map(sum, zip(*select, select_where.values()))
     _set = settostr(zip(select_where.keys(), _select))
@@ -54,7 +57,8 @@ def update_winloss_versus(table: str, fraction: str, select_where) -> tuple:
     return (_set, _where)
 
 
-def update_overall(fraction: str, select_where) -> tuple:
+def set_where_overall(fraction: str, select_where) -> tuple:
+    """Conditions for updating table 'overall'"""
     select = read("overall", fraction)
     _select = map(sum, zip(*select, [select_where["Win"]] * 2))
     _set = settostr(zip(["Overall", FRACTIONS[fraction]], _select))
@@ -62,7 +66,7 @@ def update_overall(fraction: str, select_where) -> tuple:
     return (_set, _where)
 
 
-def write(table: str) -> None:
+def write(table: str) -> None:   
     """Writing data to pivot table"""
     if table in ("win_loss", "versus"):
         write_winloss_versus_table(table)
@@ -95,6 +99,7 @@ def write_overal_table(table: str) -> None:
 
 
 def update_all(rows: list, tables: list = ["win_loss", "versus", "overall"]) -> None:
+    """ГUpdating all pivot tables"""
     [update(rows, table) for table in tables]
 
 

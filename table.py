@@ -1,4 +1,3 @@
-"""Basic Table Operations"""
 from support import wheretostr, request_header, settostr
 from connection import CONN, CURSOR
 from typing import Union
