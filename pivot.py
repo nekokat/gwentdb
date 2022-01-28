@@ -104,3 +104,10 @@ def update_all(rows: list, tables: list = ["win_loss", "versus", "overall"]) -> 
 
 
 print("overall", sorted(read("overall")[0], reverse=True))
+
+'''
+request = "UPDATE overall SET Overall = '15763', Scoia’tael = '2830' WHERE rowid = 1"
+CURSOR.execute(request)
+CONN.commit()
+'''
+
