@@ -110,7 +110,7 @@ class Printify:
             self._column_size = [0] * len(self._header)
         self._column_size = self.max_columns_width(row)
 
-    def add_row(self, row) -> None:
+    def add_row(self, row: list) -> None:
         """Adds one line with data in table for printing"""
         self._rows.append(row)
         self.column_size(row)

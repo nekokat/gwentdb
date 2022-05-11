@@ -10,7 +10,7 @@ FRACTIONS = dict(CFG["fraction"])
 RESULT = dict(CFG["result"])
 
 
-def read(table: str, _where: dict = {}) -> list:
+def read(table: str, _where: dict = dict()) -> list:
     """Reading data from a pivot table"""
     if table in ["win_loss", "versus"]:
         return tb.read(table, _where)
