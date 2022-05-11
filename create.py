@@ -4,6 +4,7 @@ from support import request_header
 
 
 MASTER_TABLE = ("lastrow", "games")
+PIVOT_TABLE = ("win_loss", "versus", "overall")
 
 
 def table_header(table: str) -> str:
@@ -37,5 +38,5 @@ def createall() -> None:
     """Creates all tables in the database."""
     for table in MASTER_TABLE:
         create(table)
-    for table in ("win_loss", "versus", "overall"):
+    for table in PIVOT_TABLE:
         create_pivot(table)

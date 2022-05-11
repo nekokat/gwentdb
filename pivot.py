@@ -5,7 +5,6 @@ from connection import CONN, CURSOR
 import toml
 
 
-# config
 CFG = toml.load("config.toml")
 FRACTIONS = dict(CFG["fraction"])
 RESULT = dict(CFG["result"])
@@ -38,7 +37,8 @@ def update(rows: list, table: str) -> None:
 
 
 def create_update(rows: list, table: str) -> dict:
-    """Formation of a dictionary that contains data for updating in pivot tables"""
+    """Formation of a dictionary that contains data
+        for updating in pivot tables"""
     table_header, position = (
         [RESULT, -2] if table in ["win_loss", "overall"] else [FRACTIONS, 3]
     )
@@ -57,7 +57,7 @@ def set_where_winloss_versus(table: str, fraction: str, select_where) -> tuple:
     return (_set, _where)
 
 
-def set_where_overall(fraction: str, select_where) -> tuple:
+def set_where_overall(fraction: str, select_where: dict) -> tuple:
     """Conditions for updating table 'overall'"""
     select = read("overall", fraction)
     _select = map(sum, zip(*select, [select_where["Win"]] * 2))
@@ -66,7 +66,7 @@ def set_where_overall(fraction: str, select_where) -> tuple:
     return (_set, _where)
 
 
-def write(table: str) -> None:   
+def write(table: str) -> None:
     """Writing data to pivot table"""
     if table in ("win_loss", "versus"):
         write_winloss_versus_table(table)
@@ -77,7 +77,8 @@ def write(table: str) -> None:
 def write_winloss_versus_table(table: str) -> None:
     """Writing data to 'win_loss' or 'versus' table"""
     header, column = (
-        [RESULT, "result"] if table == "win_loss" else [FRACTIONS, "opponent_fraction"]
+        [RESULT, "result"] if table == "win_loss" else [
+            FRACTIONS, "opponent_fraction"]
     )
     for fraction in FRACTIONS.keys():
         column_count = tuple(
@@ -110,4 +111,3 @@ request = "UPDATE overall SET Overall = '15763', Scoia’tael = '2830' WHERE row
 CURSOR.execute(request)
 CONN.commit()
 '''
-

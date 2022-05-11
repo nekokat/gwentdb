@@ -13,7 +13,8 @@ ROW_SEPARATOR = CFG["row_separator"]
 
 class Border:
     """Table border symbols"""
-    def __init__(self):
+
+    def __init__(self) -> None:
         self.top_line = TOP_LINE
         self.middle_line = MIDDLE_LINE
         self.bottom_line = BOTTOM_LINE
@@ -22,7 +23,8 @@ class Border:
         self._column_size = list()
 
     def row_style(self, sep: str) -> dict:
-        """Generates formatted cell border elements (relative to text) based on self._row_separator"""
+        """Generates formatted cell border elements (relative to text)
+            based on self._row_separator"""
         return {
             "left": sep.ljust(2),
             "right": sep.rjust(2),
@@ -76,7 +78,8 @@ class Border:
 
 class Printify:
     """Print table data"""
-    def __init__(self, table="New_Table"):
+
+    def __init__(self, table: str = "New_Table") -> None:
         self._table_name = table
         self._header = tuple()
         self._column_size = list()

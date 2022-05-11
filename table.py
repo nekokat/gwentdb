@@ -20,7 +20,7 @@ def count(table: str, _where: list = []) -> int:
     return CURSOR.execute(request).fetchall()[0][0]
 
 
-def read(table: str = "lastrow", _where: dict = {}) -> list:
+def read(table: str = "lastrow", _where: dict = dict()) -> list:
     """Reading records in a table"""
     column_list = "*"
     for fraction in _where.keys():

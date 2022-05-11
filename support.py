@@ -37,13 +37,13 @@ def modifyrows(html_data: dict, rows: list) -> Iterable[tuple]:
         yield (row[0].text, row[2].text, row[3].text, opp_fraction, *result_score)
 
 
-def wheretostr(_where, delimiter: str = ", ") -> str:
+def wheretostr(_where: list, delimiter: str = ", ") -> str:
     """Creates a 'where' clause to query a database query"""
     _where = [f"{column} = '{value}'" for column, value in _where]
     return delimiter.join(_where)
 
 
-def settostr(_set, delimiter: str = ", ") -> str:
+def settostr(_set: list, delimiter: str = ", ") -> str:
     """Creates a 'set' clause to query a database query"""
     _set = [f"{column} = '{value}'" for column, value in _set]
     return delimiter.join(_set)
