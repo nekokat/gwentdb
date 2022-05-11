@@ -48,7 +48,7 @@ def create_update(rows: list, table: str) -> dict:
     return _update
 
 
-def set_where_winloss_versus(table: str, fraction: str, select_where) -> tuple:
+def set_where_winloss_versus(table: str, fraction: str, select_where: dict) -> tuple:
     """Conditions for updating tables ('win_loss' or 'versus')"""
     select = read(table, {fraction: select_where})
     _select = map(sum, zip(*select, select_where.values()))
@@ -105,9 +105,3 @@ def update_all(rows: list, tables: list = ["win_loss", "versus", "overall"]) -> 
 
 
 print("overall", sorted(read("overall")[0], reverse=True))
-
-'''
-request = "UPDATE overall SET Overall = '15763', Scoia’tael = '2830' WHERE rowid = 1"
-CURSOR.execute(request)
-CONN.commit()
-'''

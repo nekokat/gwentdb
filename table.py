@@ -13,7 +13,7 @@ games_title = (
 )
 
 
-def count(table: str, _where: list = []) -> int:
+def count(table: str, _where: list = list()) -> int:
     """Counts the number of rows for a given condition"""
     _where = f" WHERE {wheretostr(_where, ' AND ')}" if _where != [] else ""
     request = f"SELECT count(*) FROM {table}{_where}"
