@@ -1,4 +1,4 @@
-from support import wheretostr, request_header, settostr
+from support import tostr, request_header
 from connection import CONN, CURSOR
 from typing import Union
 
@@ -15,7 +15,7 @@ games_title = (
 
 def count(table: str, _where: list = list()) -> int:
     """Counts the number of rows for a given condition"""
-    _where = f" WHERE {wheretostr(_where, ' AND ')}" if _where != [] else ""
+    _where = f" WHERE {tostr(_where, ' AND ')}" if _where != [] else ""
     request = f"SELECT count(*) FROM {table}{_where}"
     return CURSOR.execute(request).fetchall()[0][0]
 
@@ -43,7 +43,7 @@ def write(rows: Union[tuple, list], table: str = "games") -> None:
 
 def update(row: list) -> None:
     """Updates the entry in table 'lastrow'"""
-    _set = settostr(zip(games_title, row))
+    _set = tostr(zip(games_title, row))
     request = f"UPDATE lastrow SET {_set} WHERE rowid = 1"
     CURSOR.execute(request)
     CONN.commit()

@@ -1,4 +1,4 @@
-from support import wheretostr, settostr
+from support import tostr
 import table as tb
 from collections import defaultdict
 from connection import CONN, CURSOR
@@ -52,8 +52,8 @@ def set_where_winloss_versus(table: str, fraction: str, select_where: dict) -> t
     """Conditions for updating tables ('win_loss' or 'versus')"""
     select = read(table, {fraction: select_where})
     _select = map(sum, zip(*select, select_where.values()))
-    _set = settostr(zip(select_where.keys(), _select))
-    _where = wheretostr([("Fraction", fraction)])
+    _set = tostr(zip(select_where.keys(), _select))
+    _where = tostr([("Fraction", fraction)])
     return (_set, _where)
 
 
@@ -61,7 +61,7 @@ def set_where_overall(fraction: str, select_where: dict) -> tuple:
     """Conditions for updating table 'overall'"""
     select = read("overall", fraction)
     _select = map(sum, zip(*select, [select_where["Win"]] * 2))
-    _set = settostr(zip(["Overall", FRACTIONS[fraction]], _select))
+    _set = tostr(zip(["Overall", FRACTIONS[fraction]], _select))
     _where = "rowid = 1"
     return (_set, _where)
 
@@ -100,7 +100,7 @@ def write_overal_table(table: str) -> None:
 
 
 def update_all(rows: list, tables: list = ["win_loss", "versus", "overall"]) -> None:
-    """ГUpdating all pivot tables"""
+    """Updating all pivot tables"""
     [update(rows, table) for table in tables]
 
 
