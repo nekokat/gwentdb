@@ -39,7 +39,7 @@ def write(rows: Union[tuple, list], table: str = "games") -> None:
     if type(rows) == tuple:
         request = f"INSERT INTO {table} {request_header(table)} VALUES {rows}"
         CURSOR.execute(request, rows)
-    else:
+    elif type(rows) == list:
         request = f"INSERT INTO {table} VALUES (?, ?, ?, ?, ?, ?)"
         CURSOR.executemany(request, rows)
     CONN.commit()
@@ -48,6 +48,7 @@ def write(rows: Union[tuple, list], table: str = "games") -> None:
 def update(row: list) -> None:
     """Updates the entry in table 'lastrow'"""
     _set = to_str(zip(games_title, row))
+    print(_set)
     request = f"UPDATE lastrow SET {_set} WHERE rowid = 1"
     CURSOR.execute(request)
     CONN.commit()
