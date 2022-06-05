@@ -13,7 +13,7 @@ class Sql:
         self.DATABASE_NAME = self.CFG["database"]
         self.request = str()
         self.connection = sqlite3.connect(self.DATABASE_NAME)
-        self.cursor = self.connection.cursor
+        self.cursor = self.connection.cursor()
 
     def select(self, table, column_list='*'):
         self.request = f"SELECT {column_list} FROM {table}"
@@ -28,14 +28,12 @@ class Sql:
         if value:
             self.request += " VALUES "
             self.request += str(value)
-        self.cursor().execute(self.request)
-        self.connection.commit()
+        self.cursor.execute(self.request)
         return self
 
     def executemany(self, values: List[rows]):
         for value in values:
-            self.cursor().execute(self.request, value)
-            self.connection.commit()
+            self.cursor.execute(self.request, value)
         return self
 
     def insert(self, table: str):
