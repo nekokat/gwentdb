@@ -2,7 +2,5 @@ from sql import Sql as Query
 
 r = Query()
 
-CONN = r.connection
-CURSOR = r.cursor
-
-print(CONN, CURSOR)
+print(r.select("lastrow").execute().fetchall())
+r.commit()
