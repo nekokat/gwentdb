@@ -12,14 +12,8 @@ class Sql:
         self.CFG = toml.load("config.toml")
         self.DATABASE_NAME = self.CFG["database"]
         self.request = str()
-
-    @property
-    def connection(self):
-        return sqlite3.connect(self.DATABASE_NAME)
-
-    @property
-    def cursor(self):
-        return self.connection.cursor
+        self.connection = sqlite3.connect(self.DATABASE_NAME)
+        self.cursor = self.connection.cursor
 
     def select(self, table, column_list='*'):
         self.request = f"SELECT {column_list} FROM {table}"
@@ -27,7 +21,7 @@ class Sql:
 
     def where(self, *args, **kwargs):
         self.request += " WHERE "
-        self.request += (" and ".join(f'{k} = \"{v}\"' for k, v in kwargs.items()))
+        self.request += (" and ".join(f"{k} = \'{v}\'" for k, v in kwargs.items()))
         return self
 
     def execute(self, *value: rows):
@@ -65,4 +59,6 @@ class Sql:
         return self
 
     def commit(self):
+        self.connection.commit()
         self.request = str()
+        return self
