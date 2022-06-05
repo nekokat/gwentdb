@@ -1,6 +1,6 @@
-from bs4 import BeautifulSoup as soup
+from bs4 import BeautifulSoup as Soup
 import table as tb
-from support import modifyrows, log
+from support import modify_rows, log
 import toml
 import csv
 
@@ -15,13 +15,13 @@ def parsehtml(filename: str) -> list:
     """Parsed html file"""
     with open(filename, "r", encoding="utf-8") as f:
         contents = f.read()
-        sp = soup(contents, "lxml")
+        sp = Soup(contents, "lxml")
         return [tuple(row) for row in sp.tbody.find_all("tr")]
 
 
 def from_html(filename: str = HTML_FILE) -> list:
     """Import data from html file"""
-    rows = list(modifyrows(HTML_DATA, parsehtml(filename)))
+    rows = list(modify_rows(HTML_DATA, parsehtml(filename)))
     if tb.count("lastrow") == 0:
         tb.write(rows[0], "lastrow")
         num_lastrow = len(rows)
@@ -43,7 +43,7 @@ def from_csv(filename: str = CSV_FILE) -> list:
 
 
 def import_file(import_from: int) -> list:
-    """Choising import method"""
+    """Choice import method"""
     if import_from == 1:
         return from_html()
     else:

@@ -1,17 +1,19 @@
-from support import tostr
+from support import to_str
 import table as tb
 from collections import defaultdict
 from connection import CONN, CURSOR
 import toml
-
 
 CFG = toml.load("config.toml")
 FRACTIONS = dict(CFG["fraction"])
 RESULT = dict(CFG["result"])
 
 
-def read(table: str, _where: dict = dict()) -> list:
+def read(table: str, _where=None) -> list:
     """Reading data from a pivot table"""
+    if _where is None:
+        _where = dict()
+    request = None
     if table in ["win_loss", "versus"]:
         return tb.read(table, _where)
     elif table in ["overall"]:
@@ -23,10 +25,11 @@ def read(table: str, _where: dict = dict()) -> list:
 def update(rows: list, table: str) -> None:
     """Updating data in a pivot table"""
     _update = create_update(rows, table)
+    set_where = None
     for fraction in _update.keys():
         select_where = _update[fraction]
         if table in ["win_loss", "versus"]:
-            set_where = set_where_winloss_versus(table, fraction, select_where)
+            set_where = set_where_winlossversus(table, fraction, select_where)
         elif table == "overall":
             if select_where["Win"] == 0:
                 continue
@@ -48,33 +51,33 @@ def create_update(rows: list, table: str) -> dict:
     return _update
 
 
-def set_where_winloss_versus(table: str, fraction: str, select_where: dict) -> tuple:
+def set_where_winlossversus(table: str, fraction: str, select_where: dict) -> tuple:
     """Conditions for updating tables ('win_loss' or 'versus')"""
     select = read(table, {fraction: select_where})
     _select = map(sum, zip(*select, select_where.values()))
-    _set = tostr(zip(select_where.keys(), _select))
-    _where = tostr([("Fraction", fraction)])
-    return (_set, _where)
+    _set = to_str(zip(select_where.keys(), _select))
+    _where = to_str([("Fraction", fraction)])
+    return _set, _where
 
 
-def set_where_overall(fraction: str, select_where: dict) -> tuple:
+def set_where_overall(fraction: dict, select_where: dict) -> tuple:
     """Conditions for updating table 'overall'"""
     select = read("overall", fraction)
     _select = map(sum, zip(*select, [select_where["Win"]] * 2))
-    _set = tostr(zip(["Overall", FRACTIONS[fraction]], _select))
+    _set = to_str(zip(["Overall", FRACTIONS[fraction]], _select))
     _where = "rowid = 1"
-    return (_set, _where)
+    return _set, _where
 
 
 def write(table: str) -> None:
     """Writing data to pivot table"""
     if table in ("win_loss", "versus"):
-        write_winloss_versus_table(table)
-    elif table in ("overall"):
+        write_winlossversus_table(table)
+    elif table in "overall":
         write_overal_table(table)
 
 
-def write_winloss_versus_table(table: str) -> None:
+def write_winlossversus_table(table: str) -> None:
     """Writing data to 'win_loss' or 'versus' table"""
     header, column = (
         [RESULT, "result"] if table == "win_loss" else [
@@ -99,8 +102,10 @@ def write_overal_table(table: str) -> None:
     tb.write(row, table)
 
 
-def update_all(rows: list, tables: list = ["win_loss", "versus", "overall"]) -> None:
+def update_all(rows: list, tables=None) -> None:
     """Updating all pivot tables"""
+    if tables is None:
+        tables = ["win_loss", "versus", "overall"]
     [update(rows, table) for table in tables]
 
 

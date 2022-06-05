@@ -4,10 +4,10 @@ import pivot as pv
 
 
 def main() -> None:
-    """Runing script and importing data"""
+    """Running script and importing data"""
     import_from = int(input("Import from\n(default = 1)\n\n1 - html\n2 - csv\n") or 1)
     rows = import_file(import_from)
-    if rows != []:
+    if rows:
         tb.write(rows[::-1])
         pv.update_all(rows)
 

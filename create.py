@@ -2,7 +2,6 @@ from connection import CONN, CURSOR
 import pivot as pv
 from support import request_header
 
-
 MASTER_TABLE = ("lastrow", "games")
 PIVOT_TABLE = ("win_loss", "versus", "overall")
 
@@ -10,14 +9,15 @@ PIVOT_TABLE = ("win_loss", "versus", "overall")
 def table_header(table: str) -> str:
     """Creating table header for db query"""
     header = request_header(table)
-    l = len(header)
+    length = len(header)
+    col_types = None
     if table in MASTER_TABLE:
-        types = ("TEXT",) * l
+        col_types = ("TEXT",) * length
     elif table in ["win_loss", "versus"]:
-        types = ("TEXT",) + ("INTEGER",) * (l - 1)
+        col_types = ("TEXT",) + ("INTEGER",) * (length - 1)
     elif table in ["overall"]:
-        types = ("INTEGER",) * l
-    title = [f'"{col}" {col_type}' for col, col_type in zip(header, types)]
+        col_types = ("INTEGER",) * length
+    title = [f'"{col}" {col_type}' for col, col_type in zip(header, col_types)]
     return "({})".format(", ".join(title))
 
 
@@ -34,7 +34,7 @@ def create_pivot(table: str) -> None:
     pv.write(table)
 
 
-def createall() -> None:
+def create_all() -> None:
     """Creates all tables in the database."""
     for table in MASTER_TABLE:
         create(table)

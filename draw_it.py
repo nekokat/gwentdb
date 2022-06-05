@@ -1,6 +1,6 @@
 import toml
 from support import request_header
-from typing import Iterable, Union
+from typing import Iterable, Union, List, Any
 import table as tb
 
 
@@ -22,8 +22,9 @@ class Border:
         self.row = self.row_style(self._row_separator)
         self._column_size = list()
 
-    def row_style(self, sep: str) -> dict:
-        """Generates formatted cell border elements (relative to text)
+    @staticmethod
+    def row_style(sep: str) -> dict:
+        """Generate formatted cell border elements (relative to text)
             based on self._row_separator"""
         return {
             "left": sep.ljust(2),
@@ -86,7 +87,8 @@ class Printify:
         self._rows = list()
         self._border = Border()
 
-    def column_width(self, row: tuple) -> list:
+    @staticmethod
+    def column_width(row: tuple) -> list:
         """Helper for function 'max_columns_width' if 'row' is 'tuple'."""
         return list(map(len, map(str, row)))
 
@@ -94,8 +96,9 @@ class Printify:
         """Helper for function 'max_columns_width' if 'row' is 'list'."""
         return list(self.column_width(row) for row in rows)
 
-    def max_columns_width(self, row: Union[list, tuple]) -> int:
+    def max_columns_width(self, row: Union[list, tuple]) -> List[Any]:
         """Specifies the maximum possible field size"""
+        width = None
         if type(row) == tuple:
             width = [self.column_width(row)]
         elif type(row) == list:
@@ -131,12 +134,12 @@ class Printify:
         self._table_name = table
 
     @property
-    def header(self) -> str:
+    def header(self) -> Union[list, tuple]:
         """Returns the title of the table"""
         return self._header
 
     @header.setter
-    def header(self, header: str) -> None:
+    def header(self, header: Union[list, tuple]) -> None:
         """Returns the title of the table"""
         self._header = header
         self.column_size(header)
