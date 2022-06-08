@@ -1,8 +1,5 @@
 import toml
-from support import request_header
 from typing import Iterable, Union, List, Any
-import table as tb
-
 
 CFG = toml.load("border_config.toml")
 TOP_LINE = dict(CFG["top_line"])
@@ -156,19 +153,3 @@ class Printify:
         line += self._border.draw_bottom()
         line += f"\ntable '{self._table_name}'\n"
         return line
-
-
-versus = Printify("versus")
-versus.header = request_header(versus.table_name)
-versus.add_rows(tb.read(versus.table_name))
-print(versus)
-
-win_loss = Printify("win_loss")
-win_loss.header = request_header(win_loss.table_name)
-win_loss.add_rows(tb.read(win_loss.table_name))
-print(win_loss)
-
-overall = Printify("overall")
-overall.header = request_header(overall.table_name)
-overall.add_rows(tb.read(overall.table_name))
-print(overall)

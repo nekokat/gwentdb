@@ -1,42 +1,43 @@
-from support import to_str
+from typing import Tuple, Union, Any
+from sql import Query, and_
 import table as tb
 from collections import defaultdict
-from connection import CONN, CURSOR
 import toml
 
 CFG = toml.load("config.toml")
 FRACTIONS = dict(CFG["fraction"])
 RESULT = dict(CFG["result"])
 
+q = Query()
 
-def read(table: str, _where=None) -> list:
+
+def read(table: str, columns: Union[list, str], **kwargs) -> Union[list, Any]:
     """Reading data from a pivot table"""
-    if _where is None:
-        _where = dict()
-    request = None
     if table in ["win_loss", "versus"]:
-        return tb.read(table, _where)
-    elif table in ["overall"]:
-        fraction = ("Overall, " + FRACTIONS[_where]) if _where != {} else "*"
-        request = f"SELECT {fraction} FROM overall"
-    return CURSOR.execute(request).fetchall()
+        return tb.read(table, columns, **kwargs)
+    elif table == "overall":
+        fraction = ("Overall, " + FRACTIONS[columns]) if columns != "*" else "*"
+        return q.select("overall", fraction).where(**kwargs).execute().fetchall()
 
 
 def update(rows: list, table: str) -> None:
     """Updating data in a pivot table"""
     _update = create_update(rows, table)
-    set_where = None
     for fraction in _update.keys():
-        select_where = _update[fraction]
-        if table in ["win_loss", "versus"]:
-            set_where = set_where_winlossversus(table, fraction, select_where)
-        elif table == "overall":
-            if select_where["Win"] == 0:
-                continue
-            set_where = set_where_overall(fraction, select_where)
-        request = "UPDATE {} SET {} WHERE {}".format(table, *set_where)
-        CURSOR.execute(request)
-        CONN.commit()
+        set_where = setwhere(table, fraction, _update)
+        if set_where == tuple():
+            continue
+        q.update(table).set(**set_where[0]).where(**set_where[1]).execute().commit()
+
+
+def setwhere(table: str, fraction: str, _update: dict) -> tuple:
+    select_where = _update[fraction]
+    if table in ["win_loss", "versus"]:
+        return set_where_winlossversus(table, fraction, select_where)
+    elif table == "overall":
+        if select_where["Win"] == 0:
+            return tuple()
+        return set_where_overall(fraction, select_where)
 
 
 def create_update(rows: list, table: str) -> dict:
@@ -53,19 +54,19 @@ def create_update(rows: list, table: str) -> dict:
 
 def set_where_winlossversus(table: str, fraction: str, select_where: dict) -> tuple:
     """Conditions for updating tables ('win_loss' or 'versus')"""
-    select = read(table, {fraction: select_where})
-    _select = map(sum, zip(*select, select_where.values()))
-    _set = to_str(zip(select_where.keys(), _select))
-    _where = to_str([("Fraction", fraction)])
+    select = read(table, list(select_where.keys()), Fraction=fraction)
+    _select = list(map(sum, zip(*select, select_where.values())))
+    _set = dict(zip(select_where.keys(), _select))
+    _where = {"Fraction": fraction}
     return _set, _where
 
 
-def set_where_overall(fraction: dict, select_where: dict) -> tuple:
+def set_where_overall(fraction: str, select_where: dict) -> tuple:
     """Conditions for updating table 'overall'"""
-    select = read("overall", fraction)
+    select = read("overall", columns=fraction)
     _select = map(sum, zip(*select, [select_where["Win"]] * 2))
-    _set = to_str(zip(["Overall", FRACTIONS[fraction]], _select))
-    _where = "rowid = 1"
+    _set = dict(zip(["Overall", FRACTIONS[fraction]], _select))
+    _where = {"rowid": 1}
     return _set, _where
 
 
@@ -84,22 +85,22 @@ def write_winlossversus_table(table: str) -> None:
             FRACTIONS, "opponent_fraction"]
     )
     for fraction in FRACTIONS.keys():
-        column_count = tuple(
-            tb.count("games", [("fraction", fraction), (column, value)])
+        column_count: Tuple[int] = tuple(
+            tb.count("games", **dict([("fraction", fraction), (column, value)]))
             for value in header.keys()
         )
         row = (fraction,) + column_count
-        tb.write(row, table)
+        q.insert(table).execute(row).commit()
 
 
 def write_overal_table(table: str) -> None:
     """Writing data to 'overall' table"""
     overall = tuple(
-        tb.count("games", [("fraction", fraction), ("result", "Победа")])
+        q.select("games", 'count(*)').where(and_(fraction=fraction, result="Победа")).execute().fetchall()[0][0]
         for fraction in FRACTIONS.keys()
     )
     row = (sum(overall),) + overall
-    tb.write(row, table)
+    q.insert(table).execute(row).commit()
 
 
 def update_all(rows: list, tables=None) -> None:
@@ -109,4 +110,4 @@ def update_all(rows: list, tables=None) -> None:
     [update(rows, table) for table in tables]
 
 
-print("overall", sorted(read("overall")[0], reverse=True))
+print("overall", sorted(read("overall", "*")[0], reverse=True))

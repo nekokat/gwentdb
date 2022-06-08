@@ -1,60 +1,35 @@
-from support import to_str, request_header
-from connection import CONN, CURSOR
-from typing import Union
-
-# table title
-games_title = (
-    "game_mode",
-    "fraction",
-    "opponent",
-    "opponent_fraction",
-    "result",
-    "score",
-)
+from sql import Query
+from typing import Union, Iterable
 
 
-def count(table: str, _where=None) -> int:
+q = Query()
+
+
+def count(table: str, **kwargs) -> int:
     """Counts the number of rows for a given condition"""
-    if _where is None:
-        _where = list()
-    _where = f" WHERE {to_str(_where, ' AND ')}" if _where != [] else ""
-    request = f"SELECT count(*) FROM {table}{_where}"
-    return CURSOR.execute(request).fetchall()[0][0]
+    request = q.select(table, "count(*)").where(**kwargs).execute().fetchall()
+    return request[0][0]
 
 
-def read(table: str = "lastrow", _where=None) -> list:
+def read(table: str, columns: Union[str, list] = "*", **kwargs) -> list:
     """Reading records in a table"""
-    if _where is None:
-        _where = dict()
-    column_list = "*"
-    for fraction in _where.keys():
-        column_list = ", ".join(_where[fraction].keys())
-        _where = f" WHERE Fraction = '{fraction}'"
-    request = f"SELECT {column_list} FROM {table}{_where if _where != {} else ''}"
-    return CURSOR.execute(request).fetchall()
+    return q.select(table, ",".join(columns)).where(**kwargs).execute().fetchall()
 
 
 def write(rows: Union[tuple, list], table: str = "games") -> None:
     """Writing data to tables"""
-    if type(rows) == tuple:
-        request = f"INSERT INTO {table} {request_header(table)} VALUES {rows}"
-        CURSOR.execute(request, rows)
-    elif type(rows) == list:
-        request = f"INSERT INTO {table} VALUES (?, ?, ?, ?, ?, ?)"
-        CURSOR.executemany(request, rows)
-    CONN.commit()
+    if type(rows) is tuple:
+        q.insert(table).execute(rows).commit()
+    elif type(rows) is list:
+        q.insert(table).executemany(rows).commit()
 
 
 def update(row: list) -> None:
     """Updates the entry in table 'lastrow'"""
-    _set = to_str(zip(games_title, row))
-    print(_set)
-    request = f"UPDATE lastrow SET {_set} WHERE rowid = 1"
-    CURSOR.execute(request)
-    CONN.commit()
+    games_title = ("game_mode", "fraction", "opponent", "opponent_fraction", "result", "score",)
+    q.update("lastrow").set(games_title, row).where(rowid=1).execute().commit()
 
 
 def drop(table: str = "lastrow") -> None:
     """Drops the table"""
-    CURSOR.execute(f"DROP TABLE {table}")
-    CONN.commit()
+    q.drop(table).execute().commit()
