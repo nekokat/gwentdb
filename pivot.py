@@ -85,7 +85,7 @@ def write_winlossversus_table(table: str) -> None:
             FRACTIONS, "opponent_fraction"]
     )
     for fraction in FRACTIONS.keys():
-        column_count: Tuple[int] = tuple(
+        column_count: Tuple[int, ...] = tuple(
             tb.count("games", **dict([("fraction", fraction), (column, value)]))
             for value in header.keys()
         )

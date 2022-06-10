@@ -30,10 +30,12 @@ def request_header(table: str) -> tuple:
 
 
 def and_(**kwargs) -> str:
+    """The AND operator allows the existence of multiple conditions in statement's WHERE clause."""
     return " and ".join(f"{k} = \'{v}\'" for k, v in kwargs.items())
 
 
 def or_(**kwargs) -> str:
+    """The OR operator is also used to combine multiple conditions in statement's WHERE clause."""
     return " or ".join(f"{k} = \'{v}\'" for k, v in kwargs.items())
 
 
@@ -53,7 +55,8 @@ def _table_header(table: str) -> str:
 
 
 class Query:
-    def __init__(self):
+    def __init__(self) -> None:
+        """Create request string"""
         self.CFG = toml.load("config.toml")
         self.DATABASE_NAME = self.CFG["database"]
         self.request = str()
@@ -61,15 +64,17 @@ class Query:
         self.cursor = self.connection.cursor()
 
     def select(self, table, column_list='*'):
+        """SELECT statement is used to retrieve records from one or more tables"""
         self.request = f"SELECT {column_list} FROM {table}"
         return self
 
     def create(self, table: str):
-        """Database query to create a table"""
+        """The CREATE TABLE statement allows you to create and define a table."""
         self.request += f"CREATE TABLE {table} {_table_header(table)}"
         return self
 
     def where(self, *args, **kwargs):
+        """The WHERE clause is used to filter the results from the SELECT statement"""
         if not args and not kwargs:
             return self
         self.request += " WHERE "
@@ -80,15 +85,19 @@ class Query:
         return self
 
     def fetchall(self):
+        """This routine fetches all (remaining) rows of a query result, returning a list.
+        An empty list is returned when no rows are available."""
         fetch = self.cursor.execute(self.request).fetchall()
         self.commit()
         return fetch
 
     def drop(self, table: str):
+        """DROP TABLE statement allows you to delete or remove a table from the database"""
         self.request += f"DROP TABLE {table}"
         return self
 
     def execute(self, *value: rows):
+        """This routine executes an SQL statement."""
         if value:
             self.request += " VALUES "
             self.request += str(*value)
@@ -96,6 +105,7 @@ class Query:
         return self
 
     def executemany(self, values: List[rows]):
+        """"This routine executes an SQL command against all parameter sequences or mappings found in the sequence"""
         req = self.request[:]
         for value in values:
             self.request = req
@@ -103,18 +113,23 @@ class Query:
         return self
 
     def insert(self, table: str):
+        """INSERT INTO Statement is used to add new rows of data into a table in the database."""
         self.request += f"INSERT INTO '{table}' {request_header(table)}"
         return self
 
     def update(self, table: str):
+        """UPDATE Query is used to modify the existing records in a table."""
         self.request += f"UPDATE {table}"
         return self
 
     def set(self, *args, **kwargs):
+        """Set new value for each column of the table"""
         if not args and not kwargs:
             return self
 
         def text(items):
+            """Concatenates the value for each column of the table
+            and the name of the column into a string to represent in the SET"""
             return ", ".join(f"{k} = \'{v}\'" for k, v in items)
 
         self.request += " SET "
@@ -125,6 +140,8 @@ class Query:
         return self
 
     def commit(self):
+        """This method commits the current transaction. If you don't call this method, anything you did since
+         the last call to commit() is not visible from other database connections."""
         self.connection.commit()
         self.request = str()
         return self

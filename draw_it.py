@@ -22,7 +22,7 @@ class Border:
     @staticmethod
     def row_style(sep: str) -> dict:
         """Generate formatted cell border elements (relative to text)
-            based on self._row_separator"""
+            based on _row_separator"""
         return {
             "left": sep.ljust(2),
             "right": sep.rjust(2),
@@ -148,6 +148,7 @@ class Printify:
         return f"\n{sep.join(self._border.draw_row(row) for row in data)}\n"
 
     def __str__(self) -> str:
+        """Print table"""
         line = self._border.draw_top()
         line += self.print_middle()
         line += self._border.draw_bottom()
