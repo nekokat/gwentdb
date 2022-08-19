@@ -9,7 +9,7 @@ description = ""
 name = "qwentdb"
 version = "0.2.0"
 [tool.poetry.dependencies]
-lxml = "^4.4"
+lxml = "^4.9"
 python = "^3.8"
 toml = "^0.10.2"
 bs4 = "^0.0.1"
